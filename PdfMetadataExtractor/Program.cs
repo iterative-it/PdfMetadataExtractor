@@ -15,7 +15,7 @@ if (!directoryInfo.Exists)
 
 var documents = new List<Document>();
 
-foreach (var fileInfo in directoryInfo.GetFiles())
+foreach (var fileInfo in directoryInfo.GetFiles("*.pdf").OrderBy(f => f.Name))
 {
     using var pdfReader = new PdfReader(fileInfo.FullName);
     using var pdfDocument = new PdfDocument(pdfReader);
