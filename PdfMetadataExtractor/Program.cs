@@ -1,69 +1,28 @@
-﻿using System.Diagnostics;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
+﻿using iText.Kernel.Pdf;
+using PdfMetadataExtractor;
 
-// See https://aka.ms/new-console-template for more information
+var path = Environment.GetCommandLineArgs()[1];
 
-//var metainfo = await GetMetaInfoAsync(@"");
+var directoryInfo = new DirectoryInfo(path);
 
-/*foreach (var info in metainfo.MetaInfo)
+if (!directoryInfo.Exists)
 {
-    Console.WriteLine($"{info.Key}: {info.Value}");
-}*/
-
-var pageText = ExtractTextFromPDF(@"", 1);
-Console.WriteLine(pageText);
-
-static async Task<(Dictionary<string, string> MetaInfo, string Error)> GetMetaInfoAsync(string path)
-{
-    try
-    {
-        var metaInfo = await Task.Run(() =>
-        {
-            var metaInfoDict = new Dictionary<string, string>();
-            using (var pdfReader = new PdfReader(path))
-            using (var pdfDocument = new PdfDocument(pdfReader))
-            {
-                metaInfoDict["PDF.PageCount"] = $"{pdfDocument.GetNumberOfPages():D}";
-                metaInfoDict["PDF.Version"] = $"{pdfDocument.GetPdfVersion()}";
-
-                var pdfTrailer = pdfDocument.GetTrailer();
-                var pdfDictInfo = pdfTrailer.GetAsDictionary(PdfName.Info);
-                foreach (var pdfEntryPair in pdfDictInfo.EntrySet())
-                {
-                    var key = "PDF." + pdfEntryPair.Key.ToString().Substring(1);
-                    string value;
-                    switch (pdfEntryPair.Value)
-                    {
-                        case PdfString pdfString:
-                            value = pdfString.ToUnicodeString();
-                            break;
-                        default:
-                            value = pdfEntryPair.Value.ToString();
-                            break;
-                    }
-                    metaInfoDict[key] = value;
-                }
-                return metaInfoDict;
-            }
-        });
-        return (metaInfo, null);
-    }
-    catch (Exception ex)
-    {
-        if (Debugger.IsAttached) Debugger.Break();
-        return (null, ex.Message);
-    }
+    throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + path);
 }
 
-static string ExtractTextFromPDF(string filePath, int page)
+foreach (var fileInfo in directoryInfo.GetFiles())
 {
-    PdfReader pdfReader = new PdfReader(filePath);
-    PdfDocument pdfDoc = new PdfDocument(pdfReader);
-    ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-    string pageContent = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(page), strategy);
-    pdfDoc.Close();
-    pdfReader.Close();
-    return pageContent;
+    var fileName = fileInfo.Name;
+
+    using var pdfReader = new PdfReader(fileInfo.FullName);
+    using var pdfDocument = new PdfDocument(pdfReader);
+
+    var metadata = pdfDocument.GetMetadata();
+
+    foreach ((var key, var value) in metadata)
+    {
+        Console.WriteLine($"{key}: {value}");
+    }
+
+    Console.WriteLine(pdfDocument.GetPageText());
 }
