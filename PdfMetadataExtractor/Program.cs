@@ -30,9 +30,14 @@ foreach (var fileInfo in directoryInfo.GetFiles("*.pdf").OrderBy(f => f.Name))
 
     Console.WriteLine(text);
 
+    var recipient = pdfDocument.GetRecipient();
+
     documents.Add(new Document
     {
         Filename = fileInfo.Name,
+        DocId = pdfDocument.GetDocId(),
+        RecipientName = recipient.GetRecipientName(),
+        RecipientAddress = recipient.GetRecipientAddress(),
         YourRef = text.GetValue("Your ref"),
         OurRef = text.GetValue("Our ref"),
         DirectLine = text.GetValue("Direct Line"),

@@ -19,4 +19,38 @@ public static class TextExtensions
 
         return "";
     }
+
+    public static string GetRecipientName(this string recipient)
+    {
+        if (string.IsNullOrWhiteSpace(recipient)) return "";
+
+        var reader = new StringReader(recipient);
+
+        var lines = new List<string>();
+
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            lines.Add(line);
+        }
+
+        return string.Join(" ", lines.Take(lines.Count - 1));
+    }
+
+    public static string GetRecipientAddress(this string recipient)
+    {
+        if (string.IsNullOrWhiteSpace(recipient)) return "";
+
+        var reader = new StringReader(recipient);
+
+        var lines = new List<string>();
+
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            lines.Add(line);
+        }
+
+        return lines.Last();
+    }
 }
