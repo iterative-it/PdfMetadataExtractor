@@ -43,4 +43,5 @@ foreach (var document in documents)
 
 Console.WriteLine(sb.ToString());
 
-File.WriteAllText(@"MultiCaseFiles.txt", sb.ToString());
+var now = DateTime.Now;
+File.WriteAllText($"MultiCaseFiles_{now.Year}{now.Month}{now.Day}_{now.Hour}{now.Minute}.txt", sb.ToString());

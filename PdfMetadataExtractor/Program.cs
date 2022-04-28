@@ -46,6 +46,7 @@ foreach (var fileInfo in directoryInfo.GetFiles("*.pdf").OrderBy(f => f.Name))
     });
 }
 
-using var writer = new StreamWriter("documents.csv");
+var now = DateTime.Now;
+using var writer = new StreamWriter($"documents_{now.Year}{now.Month}{now.Day}_{now.Hour}{now.Minute}.csv");
 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 csv.WriteRecords((IEnumerable) documents);
